@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="wallet-createSchema-education" author="postgres" dbms="postgresql">
+        <sql endDelimiter=";">
+            CREATE SCHEMA IF NOT EXISTS education;
+        </sql>
+    </changeSet>
+
+    <changeSet id="initial-education.create_table_task" author="postgres" dbms="postgresql">
+        <createTable schemaName="education" tableName="task">
+            <column name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="title" type="text"/>
+            <column name="description" type="text"/>
+            <column name="user_id" type="bigint"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="initial-education.task_id_seq" author="postgres" dbms="postgresql">
+        <createSequence schemaName="education" sequenceName="task_id_seq" startValue="2000"/>
+    </changeSet>
+
+    <changeSet id="initial-education.task_index" author="workchatowner">
+        <createIndex schemaName="education" tableName="task" indexName="task_uindex">
+            <column name="id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
