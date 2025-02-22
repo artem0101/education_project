@@ -3,6 +3,7 @@ package org.example.aspect;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -45,6 +46,12 @@ public class LoggingAspect {
     public void logAfterReturning(JoinPoint point, Object result) {
         logger.info("Calling method: {}", point.getSignature());
         logger.info("Find task: {}", result.toString());
+    }
+
+    @AfterThrowing(pointcut = "execution(public * org.example.service.TaskService..*(..))", throwing = "exception")
+    public void logAfterThrowing(JoinPoint point, Throwable exception) {
+        logger.error("Exception catch in: {}", point.getSignature().getName());
+        logger.error("Exception type is: {}", exception.getClass().getName());
     }
 
 }
