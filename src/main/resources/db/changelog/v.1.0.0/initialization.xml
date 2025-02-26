@@ -10,8 +10,8 @@
         </sql>
     </changeSet>
 
-    <changeSet id="initial-education.create_table_task" author="postgres" dbms="postgresql">
-        <createTable schemaName="education" tableName="task">
+    <changeSet id="initial-education.create_table_tasks" author="postgres" dbms="postgresql">
+        <createTable schemaName="education" tableName="tasks">
             <column name="id" type="bigint">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -21,12 +21,12 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="initial-education.task_id_seq" author="postgres" dbms="postgresql">
-        <createSequence schemaName="education" sequenceName="task_id_seq" startValue="2000"/>
+    <changeSet id="initial-education.tasks_id_seq" author="postgres" dbms="postgresql">
+        <createSequence schemaName="education" sequenceName="tasks_id_seq" startValue="2000"/>
     </changeSet>
 
-    <changeSet id="initial-education.task_index" author="workchatowner">
-        <createIndex schemaName="education" tableName="task" indexName="task_uindex">
+    <changeSet id="initial-education.tasks_index" author="workchatowner">
+        <createIndex schemaName="education" tableName="tasks" indexName="task_uindex">
             <column name="id"/>
         </createIndex>
     </changeSet>

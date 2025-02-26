@@ -27,15 +27,16 @@ public class LoggingAspect {
         logger.info("Tracking method start: {}", point.getSignature());
 
         var start = System.currentTimeMillis();
-
+        long end;
         Object result;
+
         try {
             result = point.proceed();
         } catch (Throwable throwable) {
             throw new RuntimeException("It's a failure.", throwable);
+        } finally {
+            end = System.currentTimeMillis();
         }
-
-        var end = System.currentTimeMillis();
 
         logger.info("Tracking method finish. Time execution method: {}. Time execution: {} ms.", point.getSignature().getName(), (end - start));
 
