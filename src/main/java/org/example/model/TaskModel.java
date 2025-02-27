@@ -15,4 +15,6 @@ public class TaskModel {
 
     private Long userId;
 
+    private String status;
+
 }

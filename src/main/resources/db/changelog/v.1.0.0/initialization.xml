@@ -25,7 +25,7 @@
         <createSequence schemaName="education" sequenceName="tasks_id_seq" startValue="2000"/>
     </changeSet>
 
-    <changeSet id="initial-education.tasks_index" author="workchatowner">
+    <changeSet id="initial-education.tasks_index" author="postgres">
         <createIndex schemaName="education" tableName="tasks" indexName="task_uindex">
             <column name="id"/>
         </createIndex>

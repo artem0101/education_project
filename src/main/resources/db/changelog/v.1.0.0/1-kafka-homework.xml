@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="education-createType" author="postgres">
+        <sql>
+            CREATE TYPE task_status AS ENUM ('IN_PROGRESS', 'POSTPONED', 'COMPLETED', 'CANCELLED');
+        </sql>
+    </changeSet>
+
+    <changeSet id="education-addColumn-tasks.status" author="postgres">
+        <addColumn schemaName="education" tableName="tasks">
+            <column name="status" type="task_status"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
