@@ -26,5 +26,36 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.xml
     default-schema: public
 
+  kafka:
+    bootstrap-servers: broker_e:29092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+##      properties:
+##        spring.json.add.type.headers: false
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.example.kafka.MessageDeserializer
+      properties:
+        spring.json.trusted.packages: "org.example.dto"
+        spring.json.value.default.type: "org.example.dto.TaskDto"
+    listener:
+      ack-mode: manual_immediate
+
 server:
   port: 8080
+
+task:
+  scan-path: org.example
+  kafka:
+    bootstrap:
+      server: broker_e:29092
+    consumer:
+      group-id: broker_e
+      max.poll.records: 10
+    producer:
+      enable: true
+    topic:
+      task_status_updated: tasks
+    listener:
+      poll-timeout: 1000

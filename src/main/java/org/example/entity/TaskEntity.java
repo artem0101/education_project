@@ -1,5 +1,7 @@
 package org.example.entity;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +14,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import org.example.entity.enums.TaskStatus;
-import org.example.model.TaskModel;
 
 @Builder
 @Getter
@@ -35,24 +36,8 @@ public class TaskEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "task_status")
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private TaskStatus status;
-
-    public TaskModel toModel() {
-        return TaskModel.builder()
-                        .id(this.id)
-                        .title(this.title)
-                        .description(this.description)
-                        .status(this.status.name())
-                        .build();
-    }
-
-    public static TaskEntity fromModel(TaskModel model) {
-        return TaskEntity.builder()
-                         .title(model.getTitle())
-                         .description(model.getDescription())
-                         .status(TaskStatus.valueOf(model.getStatus()))
-                         .build();
-    }
 
 }
