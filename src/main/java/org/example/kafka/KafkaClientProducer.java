@@ -13,19 +13,9 @@ public class KafkaClientProducer {
 
     private final KafkaTemplate template;
 
-
-    public void send(Long id) {
-        try {
-            template.sendDefault(UUID.randomUUID().toString(), id).get();
-            template.flush();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
     public void sendTo(String topic, Object o) {
         try {
-            template.send(topic, o).get();
+            template.send(topic, UUID.randomUUID().toString(), o).get();
             template.flush();
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -31,8 +31,6 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-##      properties:
-##        spring.json.add.type.headers: false
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.example.kafka.MessageDeserializer
@@ -41,6 +39,18 @@ spring:
         spring.json.value.default.type: "org.example.dto.TaskDto"
     listener:
       ack-mode: manual_immediate
+
+#Использовал mail.ru с созданием пароля для приложения при указании существующего почтового ящика.
+  mail:
+    host: smtp.mail.ru
+    port: 465
+    username: #почтовый ящик
+    password: #пароль от приложения
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.ssl.enable: true
 
 server:
   port: 8080
@@ -59,3 +69,6 @@ task:
       task_status_updated: tasks
     listener:
       poll-timeout: 1000
+
+email:
+  message-recipient: #почтовый ящик получателя нотификаций

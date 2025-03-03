@@ -53,16 +53,23 @@ public class TaskService {
 
     @AfterThrowing
     @Transactional
-    public void updateTask(long id, @NonNull TaskDto task, String topic) {
+    public void updateTask(long id, @NonNull TaskDto dto, String topic) {
         var result = taskRepository.findById(id);
         if (result.isEmpty()) {
             throw new EntityNotFoundException("Task with id " + id + " not found for update.");
-        } else if (!result.get().getStatus().name().equals(task.getStatus())) {
-            log.info("Updating task with id: {} from status: {} to status {}", id, result.get().getStatus(), task.getStatus());
-            kafkaClientProducer.sendTo(topic, task);
+        } else if (!result.get().getStatus().name().equals(dto.getStatus())) {
+            log.info("Updating task with id: {} from status: {} to status {}", id, result.get().getStatus(), dto.getStatus());
+            kafkaClientProducer.sendTo(topic, dto);
         }
 
-        taskRepository.update(id, task.getTitle(), task.getDescription(), task.getUserId());
+        result.ifPresent(entity -> {
+            entity.setTitle(dto.getTitle());
+            entity.setDescription(dto.getDescription());
+            entity.setUserId(dto.getUserId());
+            entity.setStatus(TaskStatus.valueOf(dto.getStatus()));
+
+            taskRepository.saveAndFlush(entity);
+        });
     }
 
     @BeforeLogging
