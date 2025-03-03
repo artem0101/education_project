@@ -1,12 +1,7 @@
 package org.example.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -17,9 +12,7 @@ import org.example.dto.TaskDto;
 import org.example.entity.enums.TaskStatus;
 import org.example.kafka.KafkaClientProducer;
 import org.example.repository.TaskRepository;
-
 import org.example.util.TaskMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -54,22 +47,26 @@ public class TaskService {
     @AfterThrowing
     @Transactional
     public void updateTask(long id, @NonNull TaskDto dto, String topic) {
-        var result = taskRepository.findById(id);
-        if (result.isEmpty()) {
-            throw new EntityNotFoundException("Task with id " + id + " not found for update.");
-        } else if (!result.get().getStatus().name().equals(dto.getStatus())) {
-            log.info("Updating task with id: {} from status: {} to status {}", id, result.get().getStatus(), dto.getStatus());
-            kafkaClientProducer.sendTo(topic, dto);
-        }
+        taskRepository.findById(id)
+          .ifPresentOrElse(entity -> {
+              var isStatusUpdated = !entity.getStatus()
+                                           .name()
+                                           .equals(dto.getStatus());
 
-        result.ifPresent(entity -> {
-            entity.setTitle(dto.getTitle());
-            entity.setDescription(dto.getDescription());
-            entity.setUserId(dto.getUserId());
-            entity.setStatus(TaskStatus.valueOf(dto.getStatus()));
+              entity.setTitle(dto.getTitle());
+              entity.setDescription(dto.getDescription());
+              entity.setUserId(dto.getUserId());
+              entity.setStatus(TaskStatus.valueOf(dto.getStatus()));
 
-            taskRepository.saveAndFlush(entity);
-        });
+              taskRepository.saveAndFlush(entity);
+
+              if (isStatusUpdated) {
+                  log.info("Updating task with id: {} from status: {} to status {}", id, entity.getStatus(), dto.getStatus());
+                  kafkaClientProducer.sendTo(topic, dto);
+              }
+          }, () -> {
+              throw new EntityNotFoundException("Task with id " + id + " not found for update.");
+          });
     }
 
     @BeforeLogging
@@ -85,18 +82,6 @@ public class TaskService {
                              .stream()
                              .map(TaskMapper::toModel)
                              .toList();
-    }
-
-    public List<TaskDto> parseJson() {
-        var mapper = new ObjectMapper();
-        TaskDto[] tasks;
-        try {
-            tasks = mapper.readValue(new File("src/main/resources/MOCK_DATA.json"), TaskDto[].class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return Arrays.asList(tasks);
     }
 
 }
