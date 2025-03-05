@@ -11,7 +11,7 @@ public final class TaskMapper {
 
     private TaskMapper() {}
 
-    public static TaskDto toModel(TaskEntity entity) {
+    public TaskDto toModel(TaskEntity entity) {
         return TaskDto.builder()
                         .id(entity.getId())
                         .title(entity.getTitle())
@@ -20,7 +20,7 @@ public final class TaskMapper {
                         .build();
     }
 
-    public static TaskEntity fromDto(TaskDto dto) {
+    public TaskEntity fromDto(TaskDto dto) {
         var status = Objects.isNull(dto.getStatus()) ? TaskStatus.NEW : TaskStatus.valueOf(dto.getStatus());
         return TaskEntity.builder()
                          .title(dto.getTitle())

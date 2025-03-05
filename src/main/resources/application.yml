@@ -51,6 +51,7 @@ spring:
       mail.smtp.starttls.enable: true
       mail.smtp.starttls.required: true
       mail.smtp.ssl.enable: true
+    recipient: #почтовый ящик получателя нотификаций
 
 server:
   port: 8080
@@ -69,6 +70,3 @@ task:
       task_status_updated: tasks
     listener:
       poll-timeout: 1000
-
-email:
-  message-recipient: #почтовый ящик получателя нотификаций

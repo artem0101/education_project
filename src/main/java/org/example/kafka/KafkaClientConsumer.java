@@ -3,9 +3,11 @@ package org.example.kafka;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.config.MailProperties;
 import org.example.dto.TaskDto;
 import org.example.service.EmailNotificationService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -16,13 +18,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class KaflaClientConsumer {
+@EnableConfigurationProperties(MailProperties.class)
+public class KafkaClientConsumer {
 
-    @Value("${spring.mail.username}")
-    private String from;
-    @Value("${email.message-recipient}")
-    private String to;
-
+    private final MailProperties mailProperties;
     private final EmailNotificationService emailNotificationService;
 
     @KafkaListener(
@@ -40,7 +39,7 @@ public class KaflaClientConsumer {
         try {
             messageList.forEach(dto -> {
                 var message = "Обновлён статус задачи " + dto.getTitle() + " на " + dto.getStatus();
-                emailNotificationService.sendEmail(from, to, "Обновление задачи", message);
+                emailNotificationService.sendEmail(mailProperties.getUsername(), mailProperties.getRecipient(), "Обновление задачи", message);
             });
         } finally {
             ack.acknowledge();

@@ -15,7 +15,7 @@ public class KafkaClientProducer {
 
     public void sendTo(String topic, Object o) {
         try {
-            template.send(topic, UUID.randomUUID().toString(), o).get();
+            template.send(topic, UUID.randomUUID().toString(), o);
             template.flush();
         } catch (Exception e) {
             log.error(e.getMessage(), e);

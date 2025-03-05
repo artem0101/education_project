@@ -25,13 +25,12 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final KafkaClientProducer kafkaClientProducer;
+    private final TaskMapper taskMapper;
 
     @AroundLogging
     @Transactional
     public void createTask(TaskDto task) {
-        var s = TaskMapper.fromDto(task);
-        log.info("Saving task: {}", s.toString());
-        taskRepository.save(TaskMapper.fromDto(task));
+        taskRepository.save(taskMapper.fromDto(task));
     }
 
     @AroundLogging
@@ -39,34 +38,32 @@ public class TaskService {
     @Transactional(readOnly = true)
     public ResponseEntity<TaskDto> findTask(long id) {
         return taskRepository.findById(id)
-                             .map(TaskMapper::toModel)
+                             .map(taskMapper::toModel)
                              .map(ResponseEntity::ok)
-                             .orElseGet(() -> ResponseEntity.notFound().build());
+                             .orElseGet(() -> ResponseEntity.notFound()
+                                                            .build());
     }
 
     @AfterThrowing
     @Transactional
     public void updateTask(long id, @NonNull TaskDto dto, String topic) {
-        taskRepository.findById(id)
-          .ifPresentOrElse(entity -> {
-              var isStatusUpdated = !entity.getStatus()
-                                           .name()
-                                           .equals(dto.getStatus());
+        var entity = taskRepository.findById(id)
+                                 .orElseThrow(() -> new EntityNotFoundException("Task with id " + id + " not found for update."));
 
-              entity.setTitle(dto.getTitle());
-              entity.setDescription(dto.getDescription());
-              entity.setUserId(dto.getUserId());
-              entity.setStatus(TaskStatus.valueOf(dto.getStatus()));
+        var newStatus = TaskStatus.valueOf(dto.getStatus());
+        var isStatusUpdated = !newStatus.equals(entity.getStatus());
 
-              taskRepository.saveAndFlush(entity);
+        entity.setTitle(dto.getTitle());
+        entity.setDescription(dto.getDescription());
+        entity.setUserId(dto.getUserId());
+        entity.setStatus(newStatus);
 
-              if (isStatusUpdated) {
-                  log.info("Updating task with id: {} from status: {} to status {}", id, entity.getStatus(), dto.getStatus());
-                  kafkaClientProducer.sendTo(topic, dto);
-              }
-          }, () -> {
-              throw new EntityNotFoundException("Task with id " + id + " not found for update.");
-          });
+        taskRepository.saveAndFlush(entity);
+
+        if (isStatusUpdated) {
+            log.info("Updating task with id: {} from status: {} to status {}", id, entity.getStatus(), newStatus);
+            kafkaClientProducer.sendTo(topic, dto);
+        }
     }
 
     @BeforeLogging
@@ -80,7 +77,7 @@ public class TaskService {
     public Collection<TaskDto> findAllTasks() {
         return taskRepository.findAll()
                              .stream()
-                             .map(TaskMapper::toModel)
+                             .map(taskMapper::toModel)
                              .toList();
     }
 

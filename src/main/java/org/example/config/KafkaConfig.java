@@ -99,7 +99,7 @@ public class KafkaConfig {
         return handler;
     }
 
-    @Bean("client")
+    @Bean
     public KafkaTemplate<String, TaskDto> kafkaTemplate(ProducerFactory<String, TaskDto> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
@@ -110,7 +110,7 @@ public class KafkaConfig {
             havingValue = "true",
             matchIfMissing = true
     )
-    public KafkaClientProducer producerClient(@Qualifier("client") KafkaTemplate template) {
+    public KafkaClientProducer producerClient(KafkaTemplate template) {
         template.setDefaultTopic(clientTopic);
         return new KafkaClientProducer(template);
     }
