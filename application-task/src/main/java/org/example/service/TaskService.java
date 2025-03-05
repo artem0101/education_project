@@ -4,14 +4,14 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.example.aspect.annotation.AroundLogging;
-import org.example.aspect.annotation.BeforeLogging;
 import org.example.dto.TaskDto;
 import org.example.entity.enums.TaskStatus;
 import org.example.kafka.KafkaClientProducer;
 import org.example.repository.TaskRepository;
+import org.example.starter.aspect.annotation.AfterReturningLogging;
+import org.example.starter.aspect.annotation.AfterThrowingLogging;
+import org.example.starter.aspect.annotation.AroundLogging;
+import org.example.starter.aspect.annotation.BeforeLogging;
 import org.example.util.TaskMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -34,7 +34,7 @@ public class TaskService {
     }
 
     @AroundLogging
-    @AfterReturning
+    @AfterReturningLogging
     @Transactional(readOnly = true)
     public ResponseEntity<TaskDto> findTask(long id) {
         return taskRepository.findById(id)
@@ -44,7 +44,7 @@ public class TaskService {
                                                             .build());
     }
 
-    @AfterThrowing
+    @AfterThrowingLogging
     @Transactional
     public void updateTask(long id, @NonNull TaskDto dto, String topic) {
         var entity = taskRepository.findById(id)
@@ -72,7 +72,7 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-    @AfterReturning
+    @AfterReturningLogging
     @Transactional(readOnly = true)
     public Collection<TaskDto> findAllTasks() {
         return taskRepository.findAll()
