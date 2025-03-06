@@ -1,8 +1,5 @@
 package org.example.starter.aspect;
 
-import java.util.Map;
-import java.util.function.Consumer;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -11,21 +8,16 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.example.starter.config.LoggingProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 @Aspect
 public class LoggingAspect {
 
+    private final Logger logger = LoggerFactory.getLogger(LoggingAspect.class.getName());
     private final LoggingProperties loggingProperties;
-
-    private static final Map<String, Consumer<String>> logLevels = Map.of(
-            "DEBUG", log::debug,
-            "ERROR", log::error,
-            "INFO", log::info,
-            "WARN", log::warn
-    );
 
     public LoggingAspect(LoggingProperties loggingProperties) {
         this.loggingProperties = loggingProperties;
@@ -70,7 +62,20 @@ public class LoggingAspect {
     }
 
     private void logging(String message) {
-        logLevels.getOrDefault(loggingProperties.getLevel().toUpperCase(), log::info).accept(message);
+        var level = loggingProperties.getLevel().toUpperCase();
+        switch (level) {
+            case "DEBUG":
+                logger.debug(message);
+                break;
+            case "ERROR":
+                logger.error(message);
+                break;
+            case "WARN":
+                logger.warn(message);
+                break;
+            default:
+                logger.info(message);
+        }
     }
 
 }
