@@ -2,6 +2,7 @@ package org.example.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.Collection;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.dto.TaskDto;
@@ -50,7 +51,7 @@ public class TaskService {
         var entity = taskRepository.findById(id)
                                  .orElseThrow(() -> new EntityNotFoundException("Task with id " + id + " not found for update."));
 
-        var newStatus = TaskStatus.valueOf(dto.getStatus());
+        var newStatus = (Objects.isNull(dto.getStatus())) ? entity.getStatus() : TaskStatus.valueOf(dto.getStatus());
         var isStatusUpdated = !newStatus.equals(entity.getStatus());
 
         entity.setTitle(dto.getTitle());
