@@ -70,3 +70,11 @@ task:
       task_status_updated: tasks
     listener:
       poll-timeout: 1000
+
+logging:
+  level:
+    org.springframework: INFO
+    org.example: DEBUG
+  starter:
+    enabled: true
+    level: DEBUG
