@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: education_project
+
+  mail:
+    host: smtp.example.com
+    port: 587
+    username: user@example.com
+    password: secret
+    recipient: recipient@example.com
+
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.example.kafka.MessageDeserializer
+      properties:
+        spring.json.trusted.packages: "org.example.dto"
+        spring.json.value.default.type: "org.example.dto.TaskDto"
+    listener:
+      ack-mode: manual_immediate
+
+  datasource:
+    url: jdbc:tc:postgresql:17:///education_db
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  liquibase:
+    enabled: true
+    drop-first: false
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    default-schema: public
+
+task:
+  scan-path: org.example
+  kafka:
+    bootstrap:
+      server: broker_e:29092
+    consumer:
+      group-id: broker_e
+      max.poll.records: 10
+    producer:
+      enable: true
+    topic:
+      task_status_updated: tasks
+    listener:
+      poll-timeout: 1000
+
+server:
+  port: 8080
