@@ -33,6 +33,7 @@ import java.util.List;
 class TaskControllerTest {
 
     private static final String TEST_URL = "/api/v1/tasks";
+
     @Mock
     private TaskService taskService;
 
