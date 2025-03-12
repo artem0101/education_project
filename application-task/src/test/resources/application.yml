@@ -10,6 +10,7 @@ spring:
     recipient: recipient@example.com
 
   kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -41,7 +42,7 @@ task:
   scan-path: org.example
   kafka:
     bootstrap:
-      server: broker_e:29092
+      server: ${spring.embedded.kafka.brokers}
     consumer:
       group-id: broker_e
       max.poll.records: 10
