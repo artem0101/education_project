@@ -16,6 +16,7 @@ public final class TaskMapper {
                         .id(entity.getId())
                         .title(entity.getTitle())
                         .description(entity.getDescription())
+                        .userId(entity.getUserId())
                         .status(entity.getStatus().name())
                         .build();
     }
@@ -25,6 +26,7 @@ public final class TaskMapper {
         return TaskEntity.builder()
                          .title(dto.getTitle())
                          .description(dto.getDescription())
+                         .userId(dto.getUserId())
                          .status(status)
                          .build();
     }
